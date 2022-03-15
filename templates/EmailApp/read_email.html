@@ -1,0 +1,306 @@
+{% extends "EmailApp/base.html" %}
+{% load static %}
+{% block title %}View Email{% endblock %}
+
+{% block main %}
+
+
+<script src='{% static "JavaScript/speech_to_text.js" %}'></script>
+<script src='{% static "JavaScript/text_to_speech.js" %}'></script>
+
+<aside class="lg-side">
+    <div class="inbox-head">
+        <h3>Read Email</h3>
+        <form action="#" class="pull-right position">
+            <div class="input-append">
+                <input type="text" class="sr-input" placeholder="Search Mail">
+                <button class="btn sr-btn" type="button"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <div class="inbox-body">
+        <div class="heading-inbox row">
+            <div class="col-md-8 ">
+                <div class="compose-btn box">
+                    <div>
+                        <a class="btn btn-lg btn-send" href="mail_compose.html" data-original-title="" title=""><i
+                                class="fa fa-reply"></i> Reply</a>
+                    </div>
+
+                    <div style="padding-left: 5px;">
+                        <form style="margin: 0; padding: 0;" action="{% url 'EmailApp:EmailApp-move_to_trash' %}"
+                            method="POST">
+                            {% csrf_token %}
+                            <input id="idmes" type="text" name="megid" value="{{message.0.messageid}}" hidden>
+                            <button style="display: inline;" type="submit" data-placement="top" data-toggle="tooltip"
+                                data-original-title="Trash" class="btn btn-lg tooltips"><i
+                                    class="fa fa-trash-o"></i></button>
+                        </form>
+                    </div>
+                    <div style="padding-left: 5px;">
+                        <form action="{% url 'EmailApp:EmailApp-mark_as_star' %}" method="GET">
+                            <input id="idmes" type="text" name="megid" value="{{message.0.messageid}}" hidden>
+                            <button style="display: inline; " type="submit" data-placement="top" data-toggle="tooltip"
+                                class="btn btn-lg tooltips"><i id="idstarred"
+                                    class="fa {{message.0.starstatus}}"></i></button>
+                        </form>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="col-md-4 text-right">
+                <p class="date"> {{message.0.date | slice:25}}</p>
+            </div>
+            <div class="col-md-12 ">
+
+                <h3><strong>{{message.0.subject}}</strong></h3>
+                <hr>
+            </div>
+            <hr>
+        </div>
+        <div class="sender-info">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <button type="button" class="btn btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="cyan"
+                            class="bi bi-person-fill" viewBox="0 0 16 16">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                        </svg>
+                    </button>
+                    <!-- <img alt=""
+                        src=""> -->
+                    <strong>{{ message.0.sender_name}}</strong>
+
+
+                    to
+                    <strong>{{message.0.receiver_email}}</strong>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div id="meg" class="view-mail">
+            {{message.0.fullmessage}}
+        </div>
+
+        <div class="compose-btn pull-left box">
+            <div>
+                <a class="btn btn-lg btn-send" data-original-title="" onclick="togglecard()" title=""><i
+                        class="fa fa-reply"></i> Reply</a>
+            </div>
+            <div style="padding-left: 5px;">
+                <button class="btn btn-lg " data-original-title="" onclick="togglecard()" title=""><i
+                        class="fa fa-arrow-right"></i>
+                    Forward</button>
+            </div>
+
+            <div style="padding-left: 5px;">
+                <form style="margin: 0; padding: 0;" action="{% url 'EmailApp:EmailApp-move_to_trash' %}" method="POST">
+                    {% csrf_token %}
+                    <input id="idmes" type="text" name="megid" value="{{message.0.messageid}}" hidden>
+                    <button style="display: inline;" type="submit" data-placement="top" data-toggle="tooltip"
+                        data-original-title="Trash" class="btn btn-lg tooltips"><i class="fa fa-trash-o"></i></button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- reply form -->
+    <div class="pt-40" id="replyform" style="margin: 40px 0px 30px 20px; display:none;">
+
+        <div id="myModal pt-40">
+            <div>
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h3 class="modal-title text-center">Reply</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{% url 'EmailApp:EmailApp-compose' %}" role="form" class="form-horizontal"
+                            name="compose_form" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">To</label>
+                                <div class="col-lg-10">
+                                    <input type="email" placeholder="Enter Receiver Email" name="receipent"
+                                        value="{{ message.0.sender_email }}" id="inputEmail" class="form-control">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">Message</label>
+                                <div class="col-lg-10">
+                                    <textarea rows="10" cols="30" placeholder="Type Your Message Here..."
+                                        class="form-control" id="message" name="message"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button class="btn btn-lg btn-send" type="submit"
+                                        onclick="ValidateEmail(document.compose_form.email)">Send</button>
+                                    <button class="btn btn-lg btn-danger" type="reset">Discard</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+
+    </div>
+
+    <!-- forward form -->
+    <div class="pt-40" id="forwarform" style="margin: 40px 0px 30px 20px; display:none;">
+
+        <div id="myModal pt-40">
+            <div>
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h3 class="modal-title text-center">Reply</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{% url 'EmailApp:EmailApp-compose' %}" role="form" class="form-horizontal"
+                            name="compose_form" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">To</label>
+                                <div class="col-lg-10">
+                                    <input type="email" placeholder="Enter Receiver Email" name="receipent"
+                                        value="{{ message.0.sender_email }}" id="inputEmail" class="form-control">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">Message</label>
+                                <div class="col-lg-10">
+                                    <textarea rows="10" cols="30" placeholder="Type Your Message Here..."
+                                        class="form-control" id="message" name="message"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button class="btn btn-lg btn-send" type="submit"
+                                        onclick="ValidateEmail(document.compose_form.email)">Send</button>
+                                    <button class="btn btn-lg btn-danger" type="reset">Discard</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+
+    </div>
+
+
+</aside>
+
+<!-- <textarea id="textarea" rows=10 cols=80 hidden></textarea><br> -->
+<button id="button" class="btn btn-lg btn-primary" onclick="tostartspeech()" style="display: none;"> start</button>
+{% endblock %}
+
+{% block scriptbody %}
+
+
+
+<script type="text/javascript">
+    var messid = "{{message.0.messageid}}"
+    const Label = "READ"
+    var star = "{{message.0.starstatus}}"
+    // var row = -1
+    // var messid = "{{message.0.messageid}}"
+
+    // to start speech to text by clicking button
+    document.getElementById('button').click();
+    console.log("1st time speech button is clicked inside readmails")
+
+    if (star == "fa-star-o") {
+        var x = document.getElementById('idstarred');
+        console.log("inside jquery")
+        x.style.backgroundColor = 'yellow';
+    }
+
+
+
+    // to toggle between starred and unstarred
+    jQuery(document).ready(function ($) {
+        $("#starred").click(function () {
+            if ($(this).hasClass("fa fa-star-o")) {
+                $("#starred").removeClass("fa fa-star-o");
+                $(this).addClass("fa fa-star");
+                $(this).css({ 'color': 'yellow' });
+            } else {
+                $("#starred").removeClass("fa fa-star");
+                $(this).addClass("fa fa-star-o");
+                $(this).css({ 'color': 'black' });
+            }
+
+        });
+    });
+
+
+
+    // to toggle between visible and invisible class
+    function togglecard() {
+        var x = document.getElementById('replyform');
+        if (x.style.display === 'none') {
+            x.style.display = 'block';
+        } else {
+            x.style.display = 'none';
+        }
+
+        var y = document.getElementById('forwardform');
+        if (y.style.display === 'none') {
+            y.style.display = 'block';
+        } else {
+            y.style.display = 'none';
+        }
+        // document.getElementById("myDIV").classList.toggle("invisible");
+        // document.getElementById("myDIV").addClass('visible');
+        // document.getElementById("myDIV").style.display = "visible";
+    }
+
+    // code  to play audio file of inbox introduction  
+    document.addEventListener("keydown", keyDownTextField, false);
+
+    function keyDownTextField(e) {
+        e = e || window.event;
+        if (e.keyCode == '37') {
+            // press left arrow key to play
+            speak = "you are at read mail page now"
+            readOut(speak)
+
+        }
+
+        if (e.keyCode == '39') {
+            // press right arrow key to hear the subject , message
+            speak = "Sender is" + "{{ message.0.sender_name }}"
+            readOut(speak)
+            speak = "date" + "{{message.0.date | slice:25}}"
+            // setTimeout(readOut, 1000)
+            readOut(speak)
+            // setTimeout(readOut, 1000)
+            speak = "Subject is " + "{{message.0.subject}}" + "And the message is" + `{{message.0.fullmessage}}`
+            readOut(speak)
+
+
+        }
+
+    }
+
+
+</script>
+
+
+{% endblock %}
