@@ -20,3 +20,6 @@ urlpatterns = [
     path('ajax/submit/',views.handleajaxsubmit,name="handleajaxsubmit"),
 
 ]
+
+
+# handler404 = 'EmailApp.views.handle_not_found'

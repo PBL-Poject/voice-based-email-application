@@ -23,10 +23,10 @@
         <div class="heading-inbox row">
             <div class="col-md-8 ">
                 <div class="compose-btn box">
-                    <div>
+                    <!-- <div>
                         <a class="btn btn-lg btn-send" href="mail_compose.html" data-original-title="" title=""><i
                                 class="fa fa-reply"></i> Reply</a>
-                    </div>
+                    </div> -->
 
                     <div style="padding-left: 5px;">
                         <form style="margin: 0; padding: 0;" action="{% url 'EmailApp:EmailApp-move_to_trash' %}"
@@ -87,24 +87,24 @@
         </div>
 
         <div class="compose-btn pull-left box">
-            <div>
+            <!-- <div>
                 <a class="btn btn-lg btn-send" data-original-title="" onclick="togglecard()" title=""><i
                         class="fa fa-reply"></i> Reply</a>
-            </div>
-            <div style="padding-left: 5px;">
+            </div> -->
+            <!-- <div style="padding-left: 5px;">
                 <button class="btn btn-lg " data-original-title="" onclick="togglecard()" title=""><i
                         class="fa fa-arrow-right"></i>
                     Forward</button>
-            </div>
+            </div> -->
 
-            <div style="padding-left: 5px;">
+            <!-- <div style="padding-left: 5px;">
                 <form style="margin: 0; padding: 0;" action="{% url 'EmailApp:EmailApp-move_to_trash' %}" method="POST">
                     {% csrf_token %}
                     <input id="idmes" type="text" name="megid" value="{{message.0.messageid}}" hidden>
                     <button style="display: inline;" type="submit" data-placement="top" data-toggle="tooltip"
                         data-original-title="Trash" class="btn btn-lg tooltips"><i class="fa fa-trash-o"></i></button>
                 </form>
-            </div>
+            </div> -->
 
         </div>
     </div>

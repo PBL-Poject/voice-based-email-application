@@ -17,6 +17,11 @@ from fuzzywuzzy import fuzz, process
 services = MailManager()
 profileInfo = services.service.users().getProfile(userId='me').execute()
 
+
+# def handle_not_found(request, exception):
+#     return render(request,'EmailApp/not_found.html')
+
+
 def inbox(request):  
     finalmessage = services.getmails("INBOX")
     my_dictionary = json.dumps(finalmessage)
@@ -89,11 +94,6 @@ def mark_as_star(request, messageid=None):
     return HttpResponseRedirect('/read_email/'+ messageid +'/')
     
    
-
-
-       
-
-
 
 def read_email(request, *args, **kwargs):
     message = services.readmail(kwargs['messageid'])
@@ -187,5 +187,8 @@ def handleajaxsubmit(request):
                                           str(subject), str(message))
         services.service.users().messages().send(userId='me', body=returned).execute()
         return JsonResponse({'status':'success'})
+
+
+
 
 

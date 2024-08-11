@@ -205,6 +205,4 @@ class MailManager:
 
 if __name__ == '__main__':
      obj = MailManager()
-    #  obj.getmails("SENT")
-    #  obj.composemessage("aakashsjaiswal303@gmail.com", "guptavaishnavi250@gmail.com", "test", "hello")
-    #  obj.readmail("17d7186c47dfc6bb")
+    
