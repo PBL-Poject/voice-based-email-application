@@ -1,0 +1,113 @@
+{% extends "EmailApp/base.html" %}
+{% load static %}
+{% block title %}Inbox{% endblock %}
+{% block main %}
+
+
+<script src='{% static "JavaScript/speech_to_text.js" %}'></script>
+<script src='{% static "JavaScript/text_to_speech.js" %}'></script>
+
+<aside class="lg-side">
+    <div class="inbox-head">
+        <h3>Searched Mails</h3>
+        <form action="{% url 'EmailApp:EmailApp-inbox' %}" class="pull-right position" method="POST">
+            <div class="input-append">
+                {% csrf_token %}
+                <input id="idsearch" type="text" class="sr-input" name="searchfield" placeholder="Search Mail" value="">
+                <button id="searchbutton" class="btn sr-btn" type="submit"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+    <div class="inbox-body">
+        <div class="mail-option">
+
+            <ul class="unstyled inbox-pagination">
+                <li><span>1-12 of 234</span></li>
+                <li>
+                    <a class="np-btn" href="#"><i class="fa fa-angle-left  pagination-left"></i></a>
+                </li>
+                <li>
+                    <a class="np-btn" href="#"><i class="fa fa-angle-right pagination-right"></i></a>
+                </li>
+            </ul>
+        </div>
+        <table class="table table-inbox table-hover">
+            <tbody>
+
+                {% for message in allMessages %}
+
+                <tr class="{{message.readstatus}} clickable-row"
+                    data-href='{% url "EmailApp:EmailApp-read_email" messageid=message.messageid %}'>
+                    <td class="inbox-small-cells"><i class="fa fa-star inbox-started"></i></td>
+                    <td class="view-message dont-show">{{message.sender_name | truncatewords:"3"}}</td>
+                    <td class="view-message">
+                        {{message.subject| truncatewords:"7"}}</td>
+                    <td class="view-message inbox-small-cells"><i class="fa fa-trash-o"></i></td>
+                    <td class="view-message text-right">{{message.date | truncatewords:"3" }}</td>
+
+                </tr>
+
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</aside>
+
+
+
+
+{% endblock %}
+
+
+{% block body %}
+<textarea id="textarea" rows=10 cols=80 hidden></textarea><br>
+<button id="button" class="btn btn-lg btn-primary" onclick="tostartspeech()" style="display: none;"> start</button>
+
+
+<script type="text/javascript">
+
+    // to start speech to text by clicking button
+    document.getElementById('button').click();
+    console.log("1st time speech button is clicked inside search page")
+
+    try {
+        // to paly audio on screen
+        function play() {
+            var audio = new Audio('media/audio_files/inbox.mp3');
+            audio.play();
+        }
+
+
+        // code  to play audio file of inbox introduction  
+        document.addEventListener("keydown", keyDownTextField, false);
+
+        function keyDownTextField(e) {
+            e = e || window.event;
+            if (e.keyCode == '37') {
+                // press left arrow key to play
+                play()
+            }
+
+        }
+    }
+    catch (err) {
+        console.log(err.message)
+    }
+
+    // to redirect on read mail page 
+    jQuery(document).ready(function ($) {
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+
+
+// // to search mail
+// searchbtn = document.getElementById("searchbutton")
+
+</script>
+
+
+{% endblock %}

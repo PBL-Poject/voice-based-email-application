@@ -1,0 +1,122 @@
+{% extends "EmailApp/base.html" %}
+{% load static %}
+{% block title %}Compose{% endblock %}
+{% block main %}
+<!-- <link rel="stylesheet" href="{% static 'Css/compose.css' %}"> -->
+<script src='{% static "JavaScript/compose_speech.js" %}'></script>
+<script src='{% static "JavaScript/text_to_speech.js" %}'></script>
+
+<aside class="lg-side">
+    <div class="inbox-head">
+        <h3>Compose Mail</h3>
+        <form action="#" class="pull-right position">
+            <div class="input-append">
+                <input type="text" class="sr-input" placeholder="Search Mail">
+                <button class="btn sr-btn" type="button"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+    <div class="inbox-body">
+
+        <!-- Modal -->
+        <div id="myModal">
+            <div>
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h3 class="modal-title text-center">New Message</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{% url 'EmailApp:EmailApp-compose' %}" role="form" class="form-horizontal"
+                            name="compose_form" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">To</label>
+                                <div class="col-lg-10">
+                                    <input type="email" placeholder="Enter Receiver Email" name="receipent"
+                                        id="inputEmail" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">Subject</label>
+                                <div class="col-lg-10">
+                                    <input type="text" placeholder="Enter Subject" id="inputsubject" name="subject"
+                                        class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">Message</label>
+                                <div class="col-lg-10">
+                                    <textarea rows="10" cols="30" placeholder="Type Your Message Here..."
+                                        class="form-control" id="message" name="message"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button class="btn btn-lg btn-send" type="submit"
+                                        onclick="ValidateEmail(document.compose_form.email)">Send</button>
+                                    <button class="btn btn-lg btn-danger" type="reset">Discard</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div>
+
+
+</aside>
+
+{% endblock %}
+
+{% block body %}
+<textarea id="textarea" rows=10 cols=80 hidden></textarea><br>
+<button id="button" class="btn btn-lg btn-primary" onclick="tostartspeech1()" style="display: none;"> start</button>
+
+
+<script type="text/javascript">
+
+    // to start speech to text by clicking button
+    document.getElementById('button').click();
+    console.log("1st time speech button is clicked inside inbox")
+
+    // to paly audio on screen
+    function play() {
+        var audio = new Audio('/media/audio_files/compose.mp3');
+        audio.play();
+    }
+
+    // code  to play audio file of inbox introduction  
+    document.addEventListener("keydown", keyDownTextField, false);
+
+    function keyDownTextField(e) {
+        e = e || window.event;
+        if (e.keyCode == '37') {
+            // press left arrow key to play
+            play()
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+{% endblock %}

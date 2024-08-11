@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./voice_email/ml"
+    ],
+    "git.ignoreLimitWarning": true
+}

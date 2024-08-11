@@ -1,0 +1,176 @@
+{% extends "EmailApp/base.html" %}
+{% load static %}
+{% block title %}Sent Email{% endblock %}
+{% block main %}
+
+
+<script src='{% static "JavaScript/speech_to_text.js" %}'></script>
+<script src='{% static "JavaScript/text_to_speech.js" %}'></script>
+<script src='{% static "JavaScript/table.js" %}'></script>
+
+<aside class="lg-side">
+    <div class="inbox-head">
+        <h3>Sent Email</h3>
+        <form action="{% url 'EmailApp:EmailApp-search_mails' %}" class="pull-right position" method="GET">
+
+            <input id="idsearch" type="text" class="sr-input" name="searchfield" placeholder="Search Mail" value="">
+            <input id="idlabel" type="text" class="sr-input" name="labelname" placeholder="Input label" value="SENT"
+                hidden>
+            <button id="searchbutton" class="btn sr-btn" type="submit"><i class="fa fa-search"></i></button>
+
+        </form>
+    </div>
+    <div class="inbox-body">
+        <div class="mail-option">
+
+            <ul class="unstyled inbox-pagination">
+                <li><span>1-12 of 234</span></li>
+                <li>
+                    <a class="np-btn" href="#"><i class="fa fa-angle-left  pagination-left"></i></a>
+                </li>
+                <li>
+                    <a class="np-btn" href="#"><i class="fa fa-angle-right pagination-right"></i></a>
+                </li>
+            </ul>
+        </div>
+        <table id="data" class="table table-inbox table-hover">
+            <tbody>
+                {% for message in allMessages %}
+                <tr class="{{message.readstatus}} clickable-row"
+                    data-href='{% url "EmailApp:EmailApp-read_email" messageid=message.messageid %}'>
+
+                    <td class="inbox-small-cells"><i class="fa fa-star inbox-started"></i></td>
+                    <td class="view-message dont-show">To:{{message.receiver_name | truncatechars:12}}</td>
+                    <td class="view-message">{{message.subject | truncatewords:"7"}}</td>
+                    <td>
+                        <div>
+
+                            <form style="margin: 0; padding: 0;" action="{% url 'EmailApp:EmailApp-move_to_trash' %}"
+                                method="POST">
+                                {% csrf_token %}
+                                <input id="idmes" type="text" name="megid" value="{{message.messageid}}" hidden>
+                                <button style="display: inline; outline:none; border:none; background-color:#ffffff;"
+                                    type="submit" data-placement="top" data-toggle="tooltip" data-original-title="Trash"
+                                    class=" btn tooltips"><i class="fa fa-lg fa-trash-o"></i></button>
+                            </form>
+
+
+                        </div>
+                    </td>
+                    <td class="view-message text-right">{{message.date | truncatewords:"3" }}</td>
+                </tr>
+
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</aside>
+
+
+
+<button id="button" class="btn btn-lg btn-primary" onclick="tostartspeech()" style="display: none;"> start</button>
+{% endblock %}
+
+
+{% block scriptbody %}
+
+
+
+
+<script type="text/javascript">
+    var row = -1
+    var messid = ""
+    const Label = "SENT"
+
+    // to start speech to text by automatic clicking the button
+    document.getElementById('button').click();
+    console.log("1st time speech button is clicked inside sent mails")
+
+    var my_data = JSON.parse("{{ my_dic|escapejs }}");
+
+    // to paly audio on screen
+    function play() {
+        var audio = new Audio('/media/audio_files/sent.mp3');
+        audio.play();
+    }
+
+    // code  to play audio file of sent introduction  
+    document.addEventListener("keydown", keyDownTextField, false);
+
+    function keyDownTextField(e) {
+        e = e || window.event;
+        if (e.keyCode == '37') {
+            // press left arrow key to play
+            play()
+        }
+
+        if (e.keyCode == '38') {
+            // press up arrow key to scroll up
+
+            row -= 1
+
+            if (row < 0 || row == -1) {
+                speak = "You are already at top of the list, try using down arrow key or search feature"
+                readOut(speak)
+                row = -1
+
+            }
+            else {
+                highlight(row)
+                speak = "receiver is" + my_data[row]["receiver_name"]
+                readOut(speak)
+                speak = "subject is " + my_data[row]["subject"]
+                readOut(speak)
+            }
+            console.log(row)
+            // console.log(my_data[row]["sender_name"], my_data[row]["readstatus"], my_data[row]["subject"])
+        }
+        if (e.keyCode == '40') {
+            // press down arrow key to scroll down
+
+            row += 1
+
+
+            if (row >= 12) {
+                speak = "You have already reached end of the list, please try using search feature for the mail you are looking for"
+                readOut(speak)
+                row = 12
+            }
+            else {
+                highlight(row)
+                speak = "receiver is" + my_data[row]["receiver_name"]
+                readOut(speak)
+                speak = "subject is " + my_data[row]["subject"]
+                readOut(speak)
+            }
+            console.log(row)
+            // console.log(my_data[row]["sender_name"], my_data[row]["readstatus"], my_data[row]["subject"])
+
+        }
+
+
+        // to access messageid from row
+        if (row < 12 && row > -1) {
+            messid = my_data[row]["messageid"]
+            console.log(messid)
+        }
+
+
+    }
+
+
+    // to redirect on read mail page 
+    jQuery(document).ready(function ($) {
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
+    });
+
+
+
+</script>
+
+
+{% endblock %}
